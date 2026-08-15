@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  target_app:
+    build: ./app
+    container_name: target_app
+    ports:
+      - "5000:5000"
+    networks:
+      - healing_net
+
+  healer:
+    build: ./healer
+    container_name: healer_agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - target_app
+    networks:
+      - healing_net
+
+  dashboard:
+    build: ./dashboard
+    container_name: dashboard_panel
+    ports:
+      - "8080:8080"
+    depends_on:
+      - target_app
+    networks:
+      - healing_net
+
+networks:
+  healing_net:
+    driver: bridge
